@@ -1,0 +1,31 @@
+dataset_params:
+  inv_filter_from_file: splits/imagenet_5000_idx_test.txt
+  data_params:
+    return_class: true
+    root: /path/to/root/Imagenet1K/   # TODO
+    image_size: 256
+  mask_params:
+    mask_root: gt_keep_masks/
+    mask_type:  # TODO
+      # /!\ Only one should be activated at the same time for testing
+      - thick
+      # - thin
+      # - nn2
+      # - ev2li
+      # - genhalf
+      # - ex64
+  batch_size: 16
+  batch_size_val: 16
+  batch_size_test: 16
+
+args:  #guided_diffusion_params
+  model_path: /pretrained/256x256_diffusion.pt  # TODO
+  network_img_size: null
+  class_cond: true
+
+  use_classifier: true
+  classifier_path: pretrained/256x256_classifier.pt  # TODO
+
+model_params:
+  logging:
+    name: celeba

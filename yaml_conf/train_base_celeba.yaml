@@ -1,0 +1,84 @@
+checkpoint_params:
+  # TO RETRAIN FROM A .CKPT
+  # retrain_saved_path: /path/to/model.ckpt
+  # retrain_retrain_from_checkpoint: load_weights  # just load the weights and reset PL training
+  # retrain_retrain_from_checkpoint: load_train  # load a PL ckpt (also resume epochs, optimizer etc, to use to train during multiple runs)
+
+  # how often to save and how many version to save
+  on_epochs__every_n_epochs: 10
+  on_epochs__save_top_k: 10
+
+args:  #guided_diffusion_params
+  activation_checkpoint: false
+  t_mode: map_vanilla
+  t_strategy: condition
+  input_mode: clean
+  down_sample_strat: time_map
+  generation_t_map: t_map_mask
+  t_clean_value: 0
+  patch_size_train: [1, 2, 4, 8, 16, 32, 64, 128, 256]
+  patch_weight_train: [1, 1, 1, 1, 1, 1, 1, 1, 8]
+  condition_proba: [0., 1.0]
+  learn_the_condition: false
+
+model_params:
+  logging:
+    # Logging of training steps
+    log_steps:
+      early_leave: true  # if should stop logging once max_quantity is reached
+      save_image_to_disk_stage: [valid]
+      stages: [valid]
+      frequencies: [1,10,1]
+      max_quantity: 20
+
+    # Perform unconditional generations logging
+    log_generate_uncond:
+      early_leave: true
+      save_image_to_disk_stage: [valid]
+      stages: [valid]
+      frequencies: [1,1,1]
+      max_quantity: 20
+
+    # Perform conditional generations logging (inpainting)
+    log_generate_cond:
+      early_leave: true
+      stages: [valid,test]
+      save_image_to_disk_stage: [valid,test]
+      frequencies: [1,1,1]
+      max_quantity: 20
+
+    # Perform conditional generations logging (inpainting) with diversity
+    log_generate_diversity:
+      early_leave: true
+      save_image_to_disk_stage: [test]
+      stages: [test]
+      frequencies: [1,1,1]
+      max_quantity: 20
+      variation_quantity: 5
+      generate_all_in_batch: true
+
+    # how many steps in the generative diffusion process to log, 1 = log only the last image
+    time_step_in_process: 1
+
+system_params:
+  torch_params:
+    compile: false
+    torch_float32_matmul_precision: medium  # [ medium | high | highest ]
+
+trainer_params:
+  devices: 1
+  strategy: auto
+  # auto to train on 1 GPU
+  # ddp for multi gpu
+  # ddp_find_unused_parameters_true to train with metrics available
+  precision: bf16-mixed
+  limit_val_batches: 4
+  val_check_interval: null
+  check_val_every_n_epoch: 1
+  max_epochs: 1_000
+  max_steps: -1
+  num_sanity_val_steps: 0
+
+wandb_params:
+  project: ProjectName
+  mode: offline

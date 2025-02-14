@@ -1,0 +1,6 @@
+defaults:
+  - base_globalConfiguration
+
+hydra:
+  run:
+    dir: ./outputs/${now:%Y-%m-%d}_${now:%H-%M-%S}

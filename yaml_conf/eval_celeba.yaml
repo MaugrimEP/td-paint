@@ -1,0 +1,25 @@
+dataset_params:
+  #  inv_filter_from_file: splits/celebahq_test_100_diversity.txt  # TODO uncommant if performing diversity evaluation on the 100 sames images as us
+  data_params:
+    dataset_params:
+      data_params:
+        root: /path/to/CelebAMask-HQ/  # TODO
+    image_size: 256
+  mask_params:
+    mask_root: gt_keep_masks
+    mask_type:  # TODO
+      # /!\ Only one should be activated at the same time for testing
+      - thick
+      # - thin
+      # - nn2
+      # - ev2li
+      # - genhalf
+      # - ex64
+  batch_size_test: 16
+
+args:  #guided_diffusion_params
+  model_path: pretrained/celeba256_250000.pt  # TODO
+  network_img_size: null
+
+trainer_params:
+  inference_mode: true
