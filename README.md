@@ -89,3 +89,10 @@ PARAMS=(
 )
 python train_diffusion.py ${PARAMS[@]}
 ```
+
+## Checkpoints Models, Test Images, and Generated Images
+Pre-trained checkpoints for CelebA-HQ, ImageNet1K, and Places datasets, along with test datasets, masks, and generated images, are available [here](https://nuage.insa-rouen.fr/index.php/s/xigWgtHnH8ErK3b).
+
+**Important**:
+- For CelebA-HQ masks: Black areas indicate regions to keep (`black_is_keep`).
+- For ImageNet1K and Places masks: White areas indicate regions to keep (`white_is_keep`).
