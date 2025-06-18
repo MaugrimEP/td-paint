@@ -4,10 +4,14 @@ This repository is the official implementation of **TD-Paint: Faster Diffusion I
 
 This repository use code from [RePaint](https://github.com/andreas128/RePaint) and [Guided Diffusion](https://github.com/openai/guided-diffusion).
 
-![](./assets/illu.png)
+## Checkpoints Models, Test Images, and Generated Images
+Pre-trained checkpoints for CelebA-HQ, ImageNet1K, and Places datasets, along with test datasets, masks, and generated images, are available [here](https://nuage.insa-rouen.fr/index.php/s/xigWgtHnH8ErK3b).
 
-![](./assets/imagenet_predictions.png)
-![](./assets/imagenet_predictions_diversity-1.png)
+**Important**:
+- For CelebA-HQ masks: Black areas indicate regions to keep (`black_is_keep`).
+- For ImageNet1K and Places masks: White areas indicate regions to keep (`white_is_keep`).
+
+
 ## Requirements
 - python 3.10
 - pytorch 2.2.1+cu121
@@ -46,12 +50,16 @@ imagenet1k/val
      ...
 ```
 
+### Places
+Download Places2 dataset and samples the 2000 test files by copying the 2000 files from `splits/places_2000_filesnames_test.txt` to a directory of your choice.
+
 ## Training
 
 To train the model(s) in the paper,
 - read the fields in the yaml_conf and change what you need than change (paths, gpus, etc)
 - for additional configuration, please read files in `conf/`
 - run this command:
+
 ```bash
 PARAMS=(
     dataset_params/data_params=celeba
@@ -59,17 +67,28 @@ PARAMS=(
 )
 python train_diffusion.py ${PARAMS[@]}
 ```
+
 ```bash
 PARAMS=(
-    dataset_params/data_params=celeba
+    dataset_params/data_params=imagenet
     yaml_conf=["yaml_conf/train_base_imagenet.yaml","yaml_conf/train_imagenet.yaml"]
 )
 python train_diffusion.py ${PARAMS[@]}
 ```
 
-## Evaluation
+To train on your data edit the path to your train/valid/test in `yaml_conf/train_places.yaml`
+```bash
+PARAMS=(
+    dataset_params/data_params=imagedataset
+    yaml_conf=["yaml_conf/train_base_places.yaml","yaml_conf/train_places.yaml"]
+)
+python train_diffusion.py ${PARAMS[@]}
+```
 
-To evaluate TD-Paint on CelebaHQ, or ImageNet,
+
+## Predict and Evaluation
+
+To predict and evaluate TD-Paint
 - read the fields in the yaml_conf and change what you need than change (paths, gpus, etc)
 - for additional configuration, please read files in `conf/`
 - run this command:
@@ -77,22 +96,24 @@ To evaluate TD-Paint on CelebaHQ, or ImageNet,
 ```bash
 PARAMS=(
     dataset_params/data_params=celeba
-    yaml_conf=["yaml_conf/eval_base_celeba.yaml","yaml_conf/eval_celeba.yaml"]
+    yaml_conf=["yaml_conf/predict_base_celeba.yaml","yaml_conf/predict_celeba.yaml"]
 )
 python train_diffusion.py ${PARAMS[@]}
 ```
 
 ```bash
 PARAMS=(
-    dataset_params/data_params=celeba
-    yaml_conf=["yaml_conf/eval_base_imagenet.yaml","yaml_conf/eval_imagenet.yaml"]
+    dataset_params/data_params=imagenet
+    yaml_conf=["yaml_conf/predict_base_imagenet.yaml","yaml_conf/predict_imagenet.yaml"]
 )
 python train_diffusion.py ${PARAMS[@]}
 ```
 
-## Checkpoints Models, Test Images, and Generated Images
-Pre-trained checkpoints for CelebA-HQ, ImageNet1K, and Places datasets, along with test datasets, masks, and generated images, are available [here](https://nuage.insa-rouen.fr/index.php/s/xigWgtHnH8ErK3b).
-
-**Important**:
-- For CelebA-HQ masks: Black areas indicate regions to keep (`black_is_keep`).
-- For ImageNet1K and Places masks: White areas indicate regions to keep (`white_is_keep`).
+To predict on your own dataset, or on Places
+```bash
+PARAMS=(
+    dataset_params/data_params=imagedataset
+    yaml_conf=["yaml_conf/predict_base_places.yaml","yaml_conf/predict_places.yaml"]
+)
+python train_diffusion.py ${PARAMS[@]}
+```

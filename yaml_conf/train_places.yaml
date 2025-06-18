@@ -1,7 +1,9 @@
 ---
 dataset_params:
   data_params:
-    root: /path/to/CelebAMask-HQ/  # TODO
+    root_train: /path/to/train  # TODO
+    root_valid: /path/to/valid  # TODO
+    root_test: /path/to/test  # TODO
     image_size: 256
   mask_params:
     mask_root: gt_keep_masks
@@ -10,7 +12,7 @@ dataset_params:
   batch_size_test: 16
 
 args:  # guided_diffusion_params
-  model_path: pretrained/celeba256_250000.pt  # TODO
+  model_path: pretrained/places256_300000.pt
 
 trainer_params:
   inference_mode: true

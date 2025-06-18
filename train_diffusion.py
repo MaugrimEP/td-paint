@@ -9,12 +9,12 @@ import torch.backends.cudnn as cudnn
 from omegaconf import OmegaConf
 
 import wandb
-from src.callbacks.distribution_callback import IDCallback
 from conf.checkpoint_params import CheckpointsCallbacks, getModelCheckpoint
 from conf.main_params import GlobalConfiguration
 from conf.trainer_params import get_trainer
 from conf.wandb_params import get_wandb, get_wandb_logger
 from data.get_datamodule import get_dm
+from src.callbacks.distribution_callback import IDCallback
 from src.callbacks.ema import EMA
 from src.utils import get_model_class
 from utils.utils import batch_size_finder, flatten, learning_rate_finder

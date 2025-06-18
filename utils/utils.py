@@ -1,27 +1,25 @@
 import os
+from collections.abc import MutableMapping
 from dataclasses import asdict
 from typing import Optional
 
 import numpy as np
 import torch
 from beartype import beartype as typechecker
-from jaxtyping import Float, Int, jaxtyped
+from einops import repeat
+from jaxtyping import Float, Int, Shaped, jaxtyped
 from matplotlib import pyplot as plt
 from pytorch_lightning.tuner.tuning import Tuner
-from torchvision.utils import make_grid
 from skimage import color
 from skimage.segmentation import mark_boundaries
+from torchvision.utils import make_grid
 
 import wandb
 from conf.dataset_params import ValueRange
 from conf.main_params import GlobalConfiguration
 from conf.model_params import SubLoggingParams
-
-from jaxtyping import Shaped
-from einops import repeat
-from collections.abc import MutableMapping
-
 from utils.lama_colors import generate_colors
+
 COLORS, _ = generate_colors(151) # 151 - max classes for semantic segmentation
 
 colors = [
@@ -50,8 +48,7 @@ colors = [
 label_colours = dict(zip(range(len(colors)), colors))
 
 
-@jaxtyped
-@typechecker
+@jaxtyped(typechecker=typechecker)
 def mask2rgb(
     mask: Int[torch.Tensor, "b h w"],
     return_tensor: bool = True,
@@ -255,8 +252,7 @@ def undersample_list(
         return res
 
 
-@jaxtyped
-@typechecker
+@jaxtyped(typechecker=typechecker)
 def broadcast_modes_to_pixels(
     datas: list[Float[torch.Tensor, "b _ci h w"]],
     modes: Float[torch.Tensor, "b n_dom"],
@@ -272,8 +268,7 @@ def broadcast_modes_to_pixels(
     return modes
 
 
-@jaxtyped
-@typechecker
+@jaxtyped(typechecker=typechecker)
 def broadcast_modes_to_pixels_shape(
     b,
     n_dom,
@@ -359,8 +354,7 @@ def write_list_to_file(file_path: str, integer_list: list[int]):
         file.write(content)
 
 
-@jaxtyped
-@typechecker
+@jaxtyped(typechecker=typechecker)
 def patch_to_full(
     map: Shaped[torch.Tensor, 'b 1 h w'],
     patch_size: int,

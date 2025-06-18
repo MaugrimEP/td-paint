@@ -1,0 +1,28 @@
+---
+dataset_params:
+  data_params:
+    root_train: /path/to/train  # TODO
+    root_valid: /path/to/valid  # TODO
+    root_test: /path/to/test  # TODO
+    image_size: 256
+  mask_params:
+    mask_root: gt_keep_masks
+    mask_type:  # TODO
+      # /!\ Only one should be activated at the same time for testing
+      - thick
+      # - thin
+      # - nn2
+      # - ev2li
+      # - genhalf
+      # - ex64
+  batch_size_test: 16
+
+args:  # guided_diffusion_params
+  model_path: pretrained/places256_300000.pt
+
+trainer_params:
+  inference_mode: true
+
+model_params:
+  metrics:
+    no_metrics: false

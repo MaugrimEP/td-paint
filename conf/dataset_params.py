@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Union
+
 from omegaconf import MISSING, SI
 
+from conf._util import return_factory
 from conf.mask_lama_params import MaskLamaParams
 
 
@@ -21,8 +23,9 @@ class MaskParams:
     width: int = SI("${dataset_params.data_params.width}")
     return_path: bool = False  # return the path to the mask image for other than lama masks
     
+    # proba to use lama mask during training #TODO: deplace that in method params 
     lama_mask_proba: float = 0.
-    lama_mask_params: MaskLamaParams = MaskLamaParams()
+    lama_mask_params: MaskLamaParams = return_factory(MaskLamaParams())
 
 
 class ValueRange(Enum):
@@ -30,6 +33,43 @@ class ValueRange(Enum):
     ZeroUnbound = "01"
     One = "11"
     OneUnbound = "11unbound"
+
+
+@dataclass
+class ImageMaskDatasetParams:
+    """
+    Used for generate images dataset with masks provided as
+    - images in init_image
+    - masks provided in mask
+
+    and output the predictions in
+    - outdir
+    """
+    name: str = "imagemask"
+    split: int = 0
+    max_split: int = -1  # -1 for no split
+    batch_size: int = 4
+    img_extension: str = "png"
+    class_cond: bool = False
+    noverwrite: bool = False  # If True, do not remcompute already dones images
+    prompt: str = ""
+
+    outdir: str = "predictions/"
+
+    init_image: str = "images/"
+    mask: str = "masks/"
+    blackiskeep: bool = False
+
+    # not used directly just for intepolation
+    image_size: int = 256
+    height: int = SI("${dataset_params.data_params.image_size}")
+    width: int = SI("${dataset_params.data_params.image_size}")
+    channels: int = 3  # only for on domain, for the generation
+
+    value_range: ValueRange = ValueRange.One
+
+    return_indice: bool = True
+    return_path: bool = True  # return the img path in the kwargs
 
 
 # region dataset spec params
@@ -51,6 +91,43 @@ class CelebAParams:
 
     random_flip: bool = True
     return_indice: bool = False
+    return_path: bool = False  # return the img path in the kwargs
+
+
+@dataclass
+class ImageDatasetParams:
+    """
+    General image dataset without masks
+    """
+    name: str = "imagedataset"
+
+    root_train: str = "path/to/train"
+    root_valid: str = "path/to/valid"
+    root_test: str = "path/to/test"
+
+    # file used to filter the dataset and only keep a subpart 
+    valid_file: Optional[str] = None  
+    test_file: Optional[str] = None  
+
+    apply_augmentation_on_valid: bool = False
+    apply_augmentation_on_test: bool = False
+    
+    image_size: int = 256
+    class_cond: bool = False
+    height: int = SI("${dataset_params.data_params.image_size}")
+    width: int = SI("${dataset_params.data_params.image_size}")
+    channels: int = 3  # only for on domain, for the generation
+
+    value_range: ValueRange = ValueRange.One  # returning data should be in [-1,1]
+
+    random_crop: bool = True  # if True apply random crop, otherwise apply center crop
+    random_flip: bool = True
+
+    return_indice: bool = True
+    return_class: bool = False
+    
+    max_images: Optional[int] = None  # if set, we will early stop while searching for recursive images, can be set for debug
+    return_path: bool = False  # return the img path in the kwargs
 
 
 @dataclass
@@ -103,7 +180,7 @@ class DatasetParams:
     """
 
     data_params: Any = MISSING
-    mask_params: MaskParams = MaskParams()
+    mask_params: MaskParams = return_factory(MaskParams())
 
     shuffle_val: bool = False
     shuffle_test: bool = False

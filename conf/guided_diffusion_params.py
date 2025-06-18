@@ -1,13 +1,15 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from conf.jump_params import JumpParams
 from omegaconf import SI
+
+from conf._util import return_factory
+from conf.jump_params import JumpParams
 
 
 @dataclass
 class GuidedDiffusionParams:
-    scheduler_jump_params: JumpParams = JumpParams()
+    scheduler_jump_params: JumpParams = return_factory(JumpParams())
     
     network_img_size: Optional[int] = None  # the image size see by the network, not an initial param
 

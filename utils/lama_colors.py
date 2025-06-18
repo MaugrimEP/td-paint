@@ -1,10 +1,11 @@
-import random
 import colorsys
+import random
 
-import numpy as np
 import matplotlib
+import numpy as np
+
 matplotlib.use('agg')
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 
@@ -62,7 +63,7 @@ def generate_colors(nlabels, type='bright', first_color_black=False, last_color_
 
     # Display colorbar
     if verbose:
-        from matplotlib import colors, colorbar
+        from matplotlib import colorbar, colors
         from matplotlib import pyplot as plt
         fig, ax = plt.subplots(1, 1, figsize=(15, 0.5))
 

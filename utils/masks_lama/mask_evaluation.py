@@ -4,6 +4,7 @@ from copy import deepcopy
 import numpy as np
 from skimage import img_as_ubyte
 from skimage.transform import rescale, resize
+
 try:
     from detectron2 import model_zoo
     from detectron2.config import get_cfg

@@ -1,3 +1,4 @@
+---
 checkpoint_params:
   # TO RETRAIN FROM A .CKPT
   # retrain_saved_path: /path/to/model.ckpt
@@ -10,7 +11,7 @@ checkpoint_params:
   on_steps__save_top_k: 1_000
   on_steps__every_n_steps: 30_000
 
-args:  #guided_diffusion_params
+args:  # guided_diffusion_params
   activation_checkpoint: true
   t_mode: map_vanilla
   t_strategy: condition
@@ -23,6 +24,10 @@ args:  #guided_diffusion_params
   condition_proba: [0., 1.0]
   learn_the_condition: false
 
+dataset_params:
+  mask_params:
+    lama_mask_proba: 0.6
+
 model_params:
   logging:
     # Logging of training steps
@@ -30,7 +35,7 @@ model_params:
       early_leave: true
       save_image_to_disk_stage: [valid]
       stages: [valid]
-      frequencies: [1,1,1]
+      frequencies: [1, 1, 1]
       max_quantity: 20
 
     # Perform unconditional generations logging
@@ -38,15 +43,15 @@ model_params:
       early_leave: true
       save_image_to_disk_stage: [valid]
       stages: [valid]
-      frequencies: [1,1,1]
+      frequencies: [1, 1, 1]
       max_quantity: 20
 
     # Perform conditional generations logging (inpainting)
     log_generate_cond:
       early_leave: true
-      stages: [valid,test]
-      save_image_to_disk_stage: [valid,test]
-      frequencies: [1,1,1]
+      stages: [valid, test]
+      save_image_to_disk_stage: [valid, test]
+      frequencies: [1, 1, 1]
       max_quantity: 20
 
     # Perform conditional generations logging (inpainting) with diversity
@@ -54,7 +59,7 @@ model_params:
       early_leave: true
       save_image_to_disk_stage: [test]
       stages: [test]
-      frequencies: [1,1,1]
+      frequencies: [1, 1, 1]
       max_quantity: 20
       variation_quantity: 5
       generate_all_in_batch: true
@@ -67,18 +72,12 @@ model_params:
     # activate the metrics, if True then trainer_params.strategy should be set to ddp_find_unused_parameters_true
     # when using multiples devices
 
-system_params:
-  torch_params:
-    compile: false
-    torch_float32_matmul_precision: medium  # [ medium | high | highest ]
-
 trainer_params:
-  devices: 8
-  strategy: ddp
+  devices: 1
+  strategy: auto
   # auto to train on 1 GPU
   # ddp for multi gpu
   # ddp_find_unused_parameters_true to train with metrics available
-  precision: bf16-mixed
   limit_val_batches: 4
   val_check_interval: null
   check_val_every_n_epoch: 1
@@ -87,5 +86,4 @@ trainer_params:
   num_sanity_val_steps: 0
 
 wandb_params:
-  project: ProjectName
   mode: offline

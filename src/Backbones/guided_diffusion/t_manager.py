@@ -1,10 +1,12 @@
-import torch
-from jaxtyping import Float, Int
 from typing import Optional
-from src.Backbones.guided_diffusion.nn import timestep_embedding
+
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from jaxtyping import Float, Int
 from torch.utils.checkpoint import checkpoint as checkpoint_torch
+
+from src.Backbones.guided_diffusion.nn import timestep_embedding
 
 
 class VanillaStrategyTime:

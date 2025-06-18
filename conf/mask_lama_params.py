@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from conf._util import return_factory
+
 
 @dataclass
 class RampParams:
@@ -34,7 +36,6 @@ class RectangleMaskParams:
 
 @dataclass
 class SegmentationParams:
-    confidence_threshold: float = 0.5
     confidence_threshold: float = 0.5
     rigidness_mode: str = "rigid"
     max_object_area: float = 0.3
@@ -77,32 +78,35 @@ class OutpaintingParams:
 @dataclass
 class MaskLamaParams:
     irregular_proba: float = 1.
-    irregular_params: IrregularMaskParams = IrregularMaskParams(
+    irregular_params: IrregularMaskParams = return_factory(IrregularMaskParams(
         max_angle=4,
         max_len=200,
         max_width=100,
         max_times=5,
         min_times=1,
+        invert_proba=0.1,
         # draw_method='LINE',
-    )
+    ))
 
     box_proba: float = 1.
-    box_params : RectangleMaskParams = RectangleMaskParams(
-       margin=10,
-       bbox_min_size=30,
-       bbox_max_size=150,
-       max_times=4,
-       min_times=1, 
-    )
+    box_params : RectangleMaskParams = return_factory(RectangleMaskParams(
+        margin=10,
+        bbox_min_size=30,
+        bbox_max_size=150,
+        max_times=4,
+        min_times=1, 
+        invert_proba=0.1,
+    ))
     
     segm_proba: float = 0.
-    segm_params: SegmentationParams = SegmentationParams()
+    segm_params: SegmentationParams = return_factory(SegmentationParams())
     
     squares_proba: float = 0.
-    squares_params: IrregularMaskParams = IrregularMaskParams()
+    squares_params: IrregularMaskParams = return_factory(IrregularMaskParams())
     
     superres_proba: float = 0.
-    superres_params: SuperResParams = SuperResParams()
+    superres_params: SuperResParams = return_factory(SuperResParams())
 
     outpainting_proba: float = 0.
-    outpainting_params: OutpaintingParams = OutpaintingParams()
+    outpainting_params: OutpaintingParams = return_factory(OutpaintingParams())
+    

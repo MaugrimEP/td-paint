@@ -3,12 +3,13 @@ from typing import Optional
 
 from omegaconf import SI
 
+from conf._util import return_factory
 from conf.dataset_params import ValueRange
 
 
 @dataclass
 class MetricsParams:
-    no_metrics: bool = False  # if set to True, do not use Metrics but the Mock Object (for ddp training only), to remove for testing
+    no_metrics: bool = True  # if set to True, do not use Metrics but the Mock Object (for ddp training only), to remove for testing
     name: str = "celeba"
     metrics_logging_stage: tuple[str] = ("train", "valid", "test")
     metrics_logging_freq: tuple[int] = (1, 1, 1)
@@ -55,9 +56,9 @@ class OptimizersParams:
     weight_decay: float = 0.0
     momentum: float = 0.9
 
-    learning_rate_warmup: LearningRateWarmUp = LearningRateWarmUp()
-    cosinus_params: CosinusParams = CosinusParams()
-    ema: EMAParams = EMAParams()
+    learning_rate_warmup: LearningRateWarmUp = return_factory(LearningRateWarmUp())
+    cosinus_params: CosinusParams = return_factory(CosinusParams())
+    ema: EMAParams = return_factory(EMAParams())
 
     max_epochs: int = SI("${trainer_params.max_epochs}")
     max_steps: int = SI("${trainer_params.max_steps}")
@@ -98,16 +99,33 @@ class SubLoggingParamsDiversity(SubLoggingParams):
 
 
 @dataclass
+class KIDParams:
+    feature: int = 2_048
+    subsets: int = 100
+    subset_size: int = 1_000
+    degree: int = 3
+    gamma: Optional[float] = None
+    coef: float = 1.0
+    reset_real_features: bool = False
+    normalize: bool = True
+    """
+    If argument normalize is True images are expected to be dtype
+    float and have values in the [0,1] range, else if normalize is
+    set to False images are expected to have dtype uint8 and take
+    values in the [0, 255] range.
+    """
+
+@dataclass
 class LoggingParams:
     name: str = "celeba"
 
     # Logging step params
-    log_steps: SubLoggingParams = SubLoggingParams()
+    log_steps: SubLoggingParams = return_factory(SubLoggingParams())
 
     # Logging generate params
-    log_generate_uncond: SubLoggingParams = SubLoggingParams()
-    log_generate_cond: SubLoggingParams = SubLoggingParams()
-    log_generate_diversity: SubLoggingParamsDiversity = SubLoggingParamsDiversity()
+    log_generate_uncond: SubLoggingParams = return_factory(SubLoggingParams())
+    log_generate_cond: SubLoggingParams = return_factory(SubLoggingParams())
+    log_generate_diversity: SubLoggingParamsDiversity = return_factory(SubLoggingParamsDiversity())
     combine_sample_with_mask: bool = True  # if should combine the final single output with the GT and mask
 
     # Generation Logging parameters
@@ -123,11 +141,13 @@ class LoggingParams:
     quad_factor: float = 0.8
     value_range: ValueRange = SI("${dataset_params.data_params.value_range}")
 
+    kid_params: KIDParams = return_factory(KIDParams())
+
 
 @dataclass
 class ModelParams:
     name: str = "diffusion"
-    backbone: BackboneParams = BackboneParams()
-    logging: LoggingParams = LoggingParams()
-    metrics: MetricsParams = MetricsParams()
-    optimizer: OptimizersParams = OptimizersParams()
+    backbone: BackboneParams = return_factory(BackboneParams())
+    logging: LoggingParams = return_factory(LoggingParams())
+    metrics: MetricsParams = return_factory(MetricsParams())
+    optimizer: OptimizersParams = return_factory(OptimizersParams())

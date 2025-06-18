@@ -1,7 +1,7 @@
 from typing import Union
 
 import torch
-from beartype import beartype
+from beartype import beartype as typechecker
 from einops import rearrange, repeat
 from jaxtyping import Float, jaxtyped
 from lpips import lpips
@@ -17,8 +17,7 @@ class DiversityMetric(Metric):
 
         self.loss_fn_alex_sp = lpips.LPIPS(spatial=True)
 
-    @jaxtyped
-    @beartype
+    @jaxtyped(typechecker=typechecker)
     def update(
         self,
         preds: Float[Tensor, "b n c h w"],

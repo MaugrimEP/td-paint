@@ -7,7 +7,8 @@ from jaxtyping import Float, Int
 from PIL import Image
 
 from conf.dataset_params import CelebAParams
-from data.CelebADataset.celebahq_transforms import get_image_transform, get_image_augmentation
+from data.CelebADataset.celebahq_transforms import (get_image_augmentation,
+                                                    get_image_transform)
 from data.UtilsDataset import CustomDataModule
 from utils.utils import display_mask, display_tensor
 
@@ -51,6 +52,7 @@ class CelebAHQDataset(data.Dataset):
     def __getitem__(
         self, idx: int
     ) -> tuple[Int[torch.Tensor, "1"], Float[torch.Tensor, "3 h w"], dict]:
+        out_dict = dict()
         img_path = self.imgs[idx]
         img_number = fromFilenameGetNumber(img_path)
         img = Image.open(osp.join(self.params.root, SRC_FACE, img_path))
@@ -60,7 +62,10 @@ class CelebAHQDataset(data.Dataset):
         # img and sketch is in [0, 1], put them in [-1, 1]
         img = img * 2 - 1
 
-        return torch.tensor(img_number), img, dict()
+        if self.params.return_path:
+            out_dict['img_path'] = img_path
+
+        return torch.tensor(img_number), img, out_dict
 
     def __len__(self) -> int:
         return len(self.imgs)

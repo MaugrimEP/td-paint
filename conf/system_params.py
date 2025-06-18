@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from conf._util import return_factory
+
 
 @dataclass
 class TorchParams:
@@ -16,4 +18,4 @@ class TorchParams:
 
 @dataclass
 class SystemParams:
-    torch_params: TorchParams = TorchParams()
+    torch_params: TorchParams = return_factory(TorchParams())

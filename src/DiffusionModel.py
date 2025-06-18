@@ -1,35 +1,34 @@
 import copy
-import time
 import random
+import time
 from typing import Any, Literal, Optional
-from torchvision.utils import save_image
+
 import pytorch_lightning as pl
 import torch
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
+from beartype import beartype as typechecker
 from einops import repeat
 from jaxtyping import Float, Int, jaxtyped
-from beartype import beartype as typechecker
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
-from src.Backbones.guided_diffusion.gaussian_diffusion import _extract_into_tensor
+from torchvision.utils import save_image
 
 from conf.dataset_params import DatasetParams
 from conf.guided_diffusion_params import GuidedDiffusionParams
 from conf.model_params import ModelParams
 from src.Backbones.guided_diffusion.fp16_util import MixedPrecisionTrainer
+from src.Backbones.guided_diffusion.gaussian_diffusion import \
+    _extract_into_tensor
 from src.Backbones.guided_diffusion.resample import (
-    create_named_schedule_sampler,
-    LossAwareSampler,
-)
-from src.Backbones.guided_diffusion.script_util import create_classifier, create_classifier_and_diffusion, create_model_and_diffusion
+    LossAwareSampler, create_named_schedule_sampler)
+from src.Backbones.guided_diffusion.script_util import (
+    create_classifier, create_classifier_and_diffusion,
+    create_model_and_diffusion)
 from utils.Logging.LoggingImport import get_log_strategy
-from utils.Metric.Metrics import get_metrics
 from utils.masks_lama.masks_lama import MixedMaskGenerator
-from utils.utils import (
-    display_mask, display_tensor,
-    is_logging_time,
-    patch_to_full,
-)
+from utils.Metric.Metrics import get_metrics
+from utils.utils import (display_mask, display_tensor, is_logging_time,
+                         patch_to_full)
 
 NUM_CLASSES = 1000
 
@@ -267,8 +266,7 @@ class DiffusionModel(pl.LightningModule):
         self.log_g(train_stage, "lr", self.trainer.optimizers[0].param_groups[0]["lr"])
         return loss
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def get_t_weights_map_condition(
         self,
         batch_size: int, c: int, h: int, w: int,
@@ -313,8 +311,7 @@ class DiffusionModel(pl.LightningModule):
 
         return times, weights, condition_pixels
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def _get_t_weights_map_condition(
         self,
         batch_size: int,
@@ -650,8 +647,7 @@ class DiffusionModel(pl.LightningModule):
             self.ema_swap_model_weigts()
     # endregion END EMA FUNCTIONS
     ########################################################################################################################
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def cond_fn(
         self,
         x: Float[torch.Tensor, "b c h w"],
@@ -676,8 +672,7 @@ class DiffusionModel(pl.LightningModule):
             selected = log_probs[range(len(logits)), y.view(-1)]
             return torch.autograd.grad(selected.sum(), x_in)[0] * self.args.classifier_scale
     
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def model_fn(
         self,
         x: Float[torch.Tensor, "b c h w"],
@@ -686,8 +681,7 @@ class DiffusionModel(pl.LightningModule):
     ):
         return self.model(x, t, y if self.args.class_cond else None)
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def generate_samples(
         self,
         batch_size: int,

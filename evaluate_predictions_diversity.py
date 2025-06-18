@@ -9,16 +9,16 @@ import hydra
 import pytorch_lightning as pl
 import torch
 from omegaconf import OmegaConf
-import wandb
 from tqdm import tqdm
 
+import wandb
 from conf.main_params import GlobalConfiguration
 from conf.wandb_params import get_wandb
 from data.get_datamodule import get_dm
-from utils.Metric.Metrics import get_metrics
 from utils.evaluation.utils_diversity import get_prediction_from
-from utils.utils import flatten
-from utils.utils import display_tensor, display_mask
+from utils.Metric.Metrics import get_metrics
+from utils.utils import display_mask, display_tensor, flatten
+
 
 @hydra.main(
     version_base=None, config_name="globalConfiguration", config_path="config_yaml"
@@ -80,6 +80,9 @@ def main(_cfg: GlobalConfiguration):
     test_dataset = dm.test_dataset
     test_metrics_png = get_metrics(cfg.model_params.metrics)(cfg.model_params, cfg.dataset_params)
 
+    device = cfg.evaluation_params.device 
+    test_metrics_png = test_metrics_png.to(device)
+
     nb_diversity = cfg.evaluation_params.diversity_nb
     for i, (idx, img, info, mask) in enumerate(tqdm(test_dataset)): # type: ignore
         _preds = []
@@ -88,6 +91,9 @@ def main(_cfg: GlobalConfiguration):
             _preds.append(_pred_png)
         preds = torch.stack(_preds, dim=0)  # [diversity_nb, c, h, w ]
         assert list(preds.shape) == [nb_diversity] + list(img.shape)
+
+        preds = preds.to(device)
+        img = img.to(device)
         
         # data should have the batch dimension
         img = img.unsqueeze(0)
@@ -106,10 +112,13 @@ def main(_cfg: GlobalConfiguration):
     
     lpips_face_png = test_metrics_png.lpips_clamp_face.compute()
     ssim_face_png = test_metrics_png.ssim_clamp_face.compute()
+    kid_mean, kid_std = test_metrics_png.kid_clamp_face.compute()
     diversity_face_png = test_metrics_png.diversity.compute()
     wandb.log({
         'lpips_face_rgb': lpips_face_png,
         'ssim_face_rgb': ssim_face_png,
+        'kid_mean': kid_mean,
+        'kid_std': kid_std,
         'diversity_face_rgb': diversity_face_png,
     })
 

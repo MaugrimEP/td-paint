@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from conf._util import return_factory
+
 
 @dataclass
 class RessourcesParams:
@@ -12,6 +14,7 @@ class RessourcesParams:
 
     def set_if_needed(self ):
         import os
+
         import torch
 
         N_CORE = self.n_core
@@ -30,4 +33,4 @@ class RessourcesParams:
             torch.set_num_threads(N_THREADS_TORCH)
 
         if self.visible_devices is not None:
-            os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(x) for x in self.visible_devices])
+            os.environ["CUDA_VISIBLE_DEVICES"] = return_factory(",".join([str(x) for x in self.visible_devices]))

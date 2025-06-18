@@ -2,6 +2,7 @@ import numpy as np
 import torch as th
 
 from conf.guided_diffusion_params import GuidedDiffusionParams
+
 from .gaussian_diffusion import GaussianDiffusion
 
 

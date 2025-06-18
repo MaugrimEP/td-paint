@@ -1,25 +1,22 @@
-import torch
-from PIL import Image
-import blobfile as bf
-import numpy as np
-from jaxtyping import Int
 import os
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 
+import blobfile as bf
+import numpy as np
 import pytorch_lightning as pl
+import torch
+import torchvision.transforms.functional as TF
+from jaxtyping import Int
+from PIL import Image
 from torch.utils import data
 from torch.utils.data import Subset, random_split
 from torchvision import transforms
-import torchvision.transforms.functional as TF
 
 from conf.dataset_params import DatasetParams, MaskParams
-from utils.utils import (
-    display_mask,
-    display_tensor,
-    read_list_from_file,
-    write_list_to_file,
-)
+from utils.utils import (display_mask, display_tensor, read_list_from_file,
+                         write_list_to_file)
+
 
 def filter_func(list_images: list[str], p: DatasetParams) -> list[int]:
     # return the list of indices that are already processed

@@ -3,6 +3,8 @@ from typing import List, Optional, Union
 
 import pytorch_lightning as pl
 
+from conf._util import return_factory
+
 
 @dataclass
 class BatchSizeFinderPLParams:
@@ -20,7 +22,7 @@ class BatchSizeFinderParams:
     pick_suggestion: bool = True
     exit_after_pick: bool = True
 
-    pl_params: BatchSizeFinderPLParams = BatchSizeFinderPLParams()
+    pl_params: BatchSizeFinderPLParams = return_factory(BatchSizeFinderPLParams())
 
 
 @dataclass
@@ -41,13 +43,13 @@ class LearningRateFinderParams:
     pick_suggestion: bool = False
     exit_after_pick: bool = True
 
-    pl_params: LearningRateFinderPLParams = LearningRateFinderPLParams()
+    pl_params: LearningRateFinderPLParams = return_factory(LearningRateFinderPLParams())
 
 
 @dataclass
 class TrainerParams:
-    batch_size_finder_params: BatchSizeFinderParams = BatchSizeFinderParams()
-    learning_rate_finder_params: LearningRateFinderParams = LearningRateFinderParams()
+    batch_size_finder_params: BatchSizeFinderParams = return_factory(BatchSizeFinderParams())
+    learning_rate_finder_params: LearningRateFinderParams = return_factory(LearningRateFinderParams())
 
     max_time: Optional[str] = None  # None  # DD:HH:MM:SS (days, hours, minutes seconds)
 

@@ -1,19 +1,17 @@
+import random
 from typing import Optional
-from einops import rearrange
+
 import pytorch_lightning as pl
 import torch
+from beartype import beartype as typechecker
+from einops import rearrange
 from jaxtyping import Float, Int, jaxtyped
 from lightning_utilities.core.rank_zero import rank_zero_only
-import random
-import wandb
-from beartype import beartype as typechecker
 from torchvision.utils import save_image
 
+import wandb
 from utils.Logging.LogStrategy import LogStrategy
-from utils.utils import (
-    display_mask,
-    display_tensor,
-)
+from utils.utils import display_mask, display_tensor
 
 
 def norm_func(x: torch.Tensor) -> torch.Tensor:
@@ -239,8 +237,7 @@ class LogCelebA(LogStrategy):
         )
 ##################
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def log_generate_log_images_cond(
         self,
         plMod,
@@ -298,8 +295,7 @@ class LogCelebA(LogStrategy):
             classes=classes,
         )
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def log_generate_log_images_uncond(
         self,
         plMod,
@@ -336,10 +332,10 @@ class LogCelebA(LogStrategy):
             stage_prefix=stage_prefix,
             image_list=sample,
             classes=classes,
+            batch_idx=batch_idx,
         )
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def log_generate_log_images_diversity(
         self,
         stage_prefix: str,
@@ -395,8 +391,7 @@ class LogCelebA(LogStrategy):
             classes=classes,
         )
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def log_train(
         self,
         stage_prefix: str,
@@ -431,8 +426,7 @@ class LogCelebA(LogStrategy):
             max_quantity=self.params.log_steps.max_quantity,
         )
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def log_generate_metrics_cond(
         self,
         stage_prefix: str,
@@ -451,8 +445,7 @@ class LogCelebA(LogStrategy):
         for metric_name, value in metric_dict.items():
             plMod.log_g(stage_prefix, metric_name, value)
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def log_generate_metrics_diversity(
         self,
         stage_prefix: str,
@@ -472,8 +465,7 @@ class LogCelebA(LogStrategy):
             plMod.log_g(stage_prefix, metric_name, value)
 
     @rank_zero_only
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def save_to_wandb(
         self,
         plMod: pl.LightningModule,
@@ -502,14 +494,14 @@ class LogCelebA(LogStrategy):
 
         plMod.logger.experiment.log({f"{stage_prefix}/image": wandb_image_list})
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def save_to_disk_uncond(
         self,
         plMod: pl.LightningModule,
         stage_prefix: str,
         image_list: Float[torch.Tensor, 'b 3 h w'],
         classes: Optional[Int[torch.Tensor, 'b']],
+        batch_idx: int,
     ) -> None:
         stage_prefix = stage_prefix.replace("/", "_")
         logging_params = self.params.log_generate_uncond
@@ -520,7 +512,10 @@ class LogCelebA(LogStrategy):
         if not save_img_to_disk and not save_pt_to_disk:
             return
 
-        for i, img_i in enumerate(image_list):
+        batch_size = image_list.shape[0]
+
+        for _i, img_i in enumerate(image_list):
+            i = _i + batch_idx * batch_size
             classe_txt = ""
             if classes is not None:
                 classe_txt = f"_classe_{classes[i].item()}"
@@ -531,8 +526,7 @@ class LogCelebA(LogStrategy):
             if save_pt_to_disk:
                 torch.save(img_i, f'{filename}.pt')
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def save_to_disk_cond(
         self,
         plMod: pl.LightningModule,
@@ -568,8 +562,7 @@ class LogCelebA(LogStrategy):
                 torch.save(img_i, f'{img_filename}.pt')
                 if save_mask: torch.save(mask_i, f'{mask_filename}.pt')
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def save_to_disk_diversity(
         self,
         plMod: pl.LightningModule,

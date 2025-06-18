@@ -1,20 +1,16 @@
-import math
-import random
 import hashlib
 import logging
-from enum import Enum
+import math
+import random
 from dataclasses import asdict
+from enum import Enum
+
 import cv2
 import numpy as np
 
-from conf.mask_lama_params import (
-    IrregularMaskParams,
-    RectangleMaskParams,
-    SegmentationParams,
-    IrregularMaskParams,
-    SuperResParams,
-    OutpaintingParams,
-)
+from conf.mask_lama_params import (IrregularMaskParams, OutpaintingParams,
+                                   RectangleMaskParams, SegmentationParams,
+                                   SuperResParams)
 
 
 # from saicinpainting.utils import LinearRamp

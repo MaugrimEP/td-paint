@@ -20,3 +20,4 @@ class EvaluationParams:
     """
 
     diversity_nb: int = 10
+    device: str = "cuda"

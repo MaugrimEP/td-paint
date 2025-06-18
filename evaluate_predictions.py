@@ -9,17 +9,15 @@ import hydra
 import pytorch_lightning as pl
 import torch
 from omegaconf import OmegaConf
-import wandb
 from tqdm import tqdm
 
+import wandb
 from conf.main_params import GlobalConfiguration
 from conf.wandb_params import get_wandb
 from data.get_datamodule import get_dm
-from utils.Metric.Metrics import get_metrics
 from utils.evaluation.utils import get_prediction_from
-from utils.utils import flatten
-from utils.utils import display_tensor, display_mask
-
+from utils.Metric.Metrics import get_metrics
+from utils.utils import display_mask, display_tensor, flatten
 
 
 @hydra.main(
@@ -82,13 +80,22 @@ def main(_cfg: GlobalConfiguration):
     test_dataset = dm.test_dataset
     test_metrics_png = get_metrics(cfg.model_params.metrics)(cfg.model_params, cfg.dataset_params)
 
+    device = cfg.evaluation_params.device 
+    test_metrics_png = test_metrics_png.to(device)
+
     for i, (idx, img, info, mask) in enumerate(tqdm(test_dataset)): # type: ignore
-        pred_png = get_prediction_from(params=cfg.evaluation_params, idx_in_100=i, idx_in_ds=idx.item())
+        assert 'img_path' in info
+        pred_png = get_prediction_from(params=cfg.evaluation_params, idx_in_ds=idx.item(), path=info['img_path'])
+
+        pred_png = pred_png.to(device)
+        img = img.to(device)
         
         # data should have the batch dimension
         img = img.unsqueeze(0)
         mask = mask.unsqueeze(0)
         pred_png = pred_png.unsqueeze(0)
+        # rescale the prediction to 256x256
+        pred_png = torch.nn.functional.interpolate(pred_png, size=(256, 256))
         
         test_metrics_png.get_dict_generation_cond(
             data=img,
@@ -98,9 +105,12 @@ def main(_cfg: GlobalConfiguration):
     
     lpips_face_png = test_metrics_png.lpips_clamp_face.compute()
     ssim_face_png = test_metrics_png.ssim_clamp_face.compute()
+    kid_mean, kid_std = test_metrics_png.kid_clamp_face.compute()
     wandb.log({
         'lpips_face_rgb': lpips_face_png,
         'ssim_face_rgb': ssim_face_png,
+        'kid_mean': kid_mean,
+        'kid_std': kid_std,
     })
 
     print("<TERMINATE WANDB>")

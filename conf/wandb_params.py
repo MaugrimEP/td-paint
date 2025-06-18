@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from lightning_utilities.core.rank_zero import rank_zero_only
 from typing import Optional
 
+from lightning_utilities.core.rank_zero import rank_zero_only
 from pytorch_lightning.loggers import WandbLogger
 
 import wandb
@@ -9,7 +9,7 @@ import wandb
 
 @dataclass
 class WandbParams:
-    project: str = "ProjectName"
+    project: str = "TDPaint"
     group: str = ""  # the dataset
     name: Optional[str] = None
     notes: Optional[str] = None

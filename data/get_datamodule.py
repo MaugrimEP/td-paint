@@ -1,5 +1,7 @@
 from conf.dataset_params import DatasetParams
 from data.CelebADataset.CelebADataset import CelebADataModule
+from data.ImageDatasetInpaint.ImageDataset import ImageDatasetDataModule
+from data.ImageMaskDataset import ImageMaskDataModule
 from data.ImageNetDataset.ImageNetDataset import ImageNetDataModule
 
 
@@ -9,5 +11,9 @@ def get_dm(params: DatasetParams):
         return CelebADataModule(params)
     elif dataset_name in ["imagenet"]:
         return ImageNetDataModule(params)
+    elif dataset_name in ["imagedataset"]:
+        return ImageDatasetDataModule(params)
+    elif dataset_name in ["imagemask"]:
+        return ImageMaskDataModule(params)
     else:
         raise Exception(f"Dataset type not available: {dataset_name=}")

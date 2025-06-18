@@ -14,32 +14,24 @@
 #
 # This repository was forked from https://github.com/openai/guided-diffusion, which is under the MIT license
 
-from abc import abstractmethod
-
 import math
+from abc import abstractmethod
 from typing import Optional
 
 import torch
-from jaxtyping import Float, Int 
-from src.Backbones.guided_diffusion.t_manager import CacheStrategyTime, get_t_strategy
-
-from conf.guided_diffusion_params import GuidedDiffusionParams
-
-from .fp16_util import convert_module_to_f16, convert_module_to_f32
 import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
+from jaxtyping import Float, Int
 from torch.utils.checkpoint import checkpoint as checkpoint_torch
 
-from .nn import (
-    checkpoint,
-    conv_nd,
-    linear,
-    avg_pool_nd,
-    zero_module,
-    normalization,
-    timestep_embedding,
-)
+from conf.guided_diffusion_params import GuidedDiffusionParams
+from src.Backbones.guided_diffusion.t_manager import (CacheStrategyTime,
+                                                      get_t_strategy)
+
+from .fp16_util import convert_module_to_f16, convert_module_to_f32
+from .nn import (avg_pool_nd, checkpoint, conv_nd, linear, normalization,
+                 timestep_embedding, zero_module)
 from .unet import UNetModel
 
 

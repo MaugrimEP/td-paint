@@ -7,7 +7,7 @@ from typing import Union
 import pytorch_lightning as pl
 import torch
 from beartype import beartype as typechecker
-from jaxtyping import Float, jaxtyped, Int
+from jaxtyping import Float, Int, jaxtyped
 from pytorch_lightning import Callback, LightningModule, Trainer
 from torch.utils.data import ConcatDataset
 from torchmetrics.image import FrechetInceptionDistance
@@ -339,8 +339,7 @@ class IDCallback(Callback):
         self.reset()
         trainer.strategy.barrier()
 
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def normalize_batch(
         self,
         batch: tuple[
@@ -354,8 +353,7 @@ class IDCallback(Callback):
         data = self.normalize_sample(data)
         return data
     
-    @jaxtyped
-    @typechecker
+    @jaxtyped(typechecker=typechecker)
     def normalize_sample(
         self,
         sample: Float[torch.Tensor, "b 3 h w"],
