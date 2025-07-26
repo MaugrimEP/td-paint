@@ -5,7 +5,7 @@ This repository is the official implementation of **TD-Paint: Faster Diffusion I
 This repository use code from [RePaint](https://github.com/andreas128/RePaint) and [Guided Diffusion](https://github.com/openai/guided-diffusion).
 
 ## Checkpoints Models, Test Images, and Generated Images
-Pre-trained checkpoints for CelebA-HQ, ImageNet1K, and Places datasets, along with test datasets, masks, and generated images, are available [here](https://nuage.insa-rouen.fr/index.php/s/xigWgtHnH8ErK3b).
+Pre-trained checkpoints for CelebA-HQ, ImageNet1K, and Places datasets, along with test datasets, masks, and generated images, are available [here](https://nuage.insa-rouen.fr/index.php/s/fKyc4fQGjedwRYE).
 
 **Important**:
 - For CelebA-HQ masks: Black areas indicate regions to keep (`black_is_keep`).
